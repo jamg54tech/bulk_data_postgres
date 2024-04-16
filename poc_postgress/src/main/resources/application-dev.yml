@@ -1,0 +1,8 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+postgres:
+  url: 'jdbc:postgresql://localhost:5432/promotions'
+  user: postgres
+  password: n0m3l0
