@@ -58,4 +58,18 @@ SELECT usename, application_name, client_addr, client_port, backend_start, backe
 FROM pg_stat_activity
 WHERE state = 'active';
 
-/*DELETE FROM sku_promo_relations;*/
+/*
+
+DELETE FROM promotions;
+vacuum full promotions;
+select count(*) from promotions;
+
+DELETE FROM skus;
+vacuum full skus;
+select count(*) from skus;
+
+DELETE FROM sku_promo_relations;
+vacuum full sku_promo_relations;
+select count(*) from sku_promo_relations;
+
+*/
