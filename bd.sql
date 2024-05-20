@@ -90,4 +90,8 @@ O DE COPY Y QUE SE HAGA MAS RÁPIDO
 SHOW maintenance_work_mem;
 SET maintenance_work_mem = '1GB';
 
+SELECT constraint_name, constraint_type, table_name, column_name, foreign_table_name, foreign_column_name
+FROM information_schema.table_constraints
+WHERE constraint_type = 'FOREIGN KEY' AND table_name = 'nombre_tabla';
+
 */
