@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS promotions (
     promo_price VARCHAR(100)
 );
 
+ALTER TABLE promotions ADD PRIMARY KEY (promo_id);
+
 CREATE TABLE IF NOT EXISTS skus (
     sku VARCHAR(100),
     last_update_time TIMESTAMP,
@@ -46,11 +48,23 @@ CREATE TABLE IF NOT EXISTS skus (
     call_promo_service VARCHAR(100)
 );
 
+ALTER TABLE skus ADD PRIMARY KEY (sku);
+
+
+
 CREATE TABLE IF NOT EXISTS sku_promo_relations (
-    sku VARCHAR(100),
-    promo_id VARCHAR(100),
+    institutional_promo_id VARCHAR(100),
+    sku_promotions VARCHAR(100),
     sequence INTEGER
 );
+
+ALTER TABLE sku_promo_relations ADD CONSTRAINT inst_promo_id_foreign_key 
+FOREIGN KEY (institutional_promo_id) 
+REFERENCES skus (sku) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE sku_promo_relations ADD CONSTRAINT promo_id_foreign_key 
+FOREIGN KEY (sku_promotions) 
+REFERENCES promotions (promo_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER USER "postgres" WITH PASSWORD 'n0m3l0';
 
