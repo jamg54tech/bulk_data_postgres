@@ -3,7 +3,7 @@ import dask.dataframe as dd
 from datetime import datetime
 import time
 import os
-
+from psycopg2 import sql;
 
 def process_sku_promotion_file(conn,cur,base_path:str,file_name:str):
 
@@ -71,6 +71,7 @@ def process_relations_file(conn,cur,base_path:str,file_name:str):
     with open(filepath, 'r') as csv_buffer:
         #next(csv_buffer) #skip header
         cur.copy_from(csv_buffer, 'sku_promo_relations', sep='|')
+    csv_buffer.close();
     # Commit the transaction
     conn.commit()
 
@@ -88,25 +89,48 @@ def main():
     )
 
     #Folder where promotions files will be stored
-    base_path="C:\\Users\\JAMG54\\Desktop\\LIVERPOOL\\POCS\\PostgresCOPY\\PROMOTIONS\\";
+    base_path="C:\\Users\\jamolinag\\Desktop\\liverpool\\liverpool_promoitons_files\\20MAYO2024\\";
     # Create a cursor object using the connection
     cur = conn.cursor()
 
     try:
-
+        
         print("\n\n==============PROCESANDO ARCHIVO DE PROMOCIONES...");
         # Define the COPY command for promotions
-        promotions_file = "liverpool_sku_promotion.txt.07032024";
+        promotions_file = "liverpool_sku_promotion.csv";
         process_sku_promotion_file(conn,cur,base_path,promotions_file);
 
         print("\n\n==============PROCESANDO ARCHIVO DE SKUS...");
 
-        lp_inst_sku_promotion_file = "lp_institutional_promotion.txt.07032024"
+        lp_inst_sku_promotion_file = "lp_institutional_promotion.csv"
         process_lp_institution_sku_promotion_file(conn,cur,base_path,lp_inst_sku_promotion_file)
 
         print("\n\n==============PROCESANDO ARCHIVO DE RELACIONES...");
-        lp_relations_file = "lp_instnl_sku_promotion.txt.07032024"
+
+        print("BORRANDO CONSTRAINT inst_promo_id_foreign_key:")
+        query = sql.SQL("ALTER TABLE sku_promo_relations DROP CONSTRAINT IF EXISTS inst_promo_id_foreign_key;")
+        cur.execute(query)
+        conn.commit()
+
+        print("BORRANDO CONSTRAINT promo_id_foreign_key:")
+        query = sql.SQL("ALTER TABLE sku_promo_relations DROP CONSTRAINT IF EXISTS promo_id_foreign_key;")
+        cur.execute(query)
+        conn.commit()
+
+        print("REGISTRANDO ROWS")
+        lp_relations_file = "lp_instnl_sku_promotion.csv"
         process_relations_file(conn,cur,base_path,lp_relations_file);
+
+        print("CREANDO CONSTRAINT inst_promo_id_foreign_key:")
+        query = sql.SQL("ALTER TABLE sku_promo_relations ADD CONSTRAINT inst_promo_id_foreign_key FOREIGN KEY (institutional_promo_id) REFERENCES skus (sku) ON DELETE CASCADE ON UPDATE CASCADE;")
+        cur.execute(query)
+        conn.commit()
+
+        print("CREANDO CONSTRAINT promo_id_foreign_key:")
+        query = sql.SQL("ALTER TABLE sku_promo_relations ADD CONSTRAINT promo_id_foreign_key FOREIGN KEY (sku_promotions) REFERENCES promotions (promo_id) ON DELETE CASCADE ON UPDATE CASCADE;")
+        cur.execute(query)
+        conn.commit()
+
 
         print("\n\n PROCESAMIENTO EXITOSO")
 
