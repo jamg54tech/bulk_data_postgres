@@ -85,4 +85,9 @@ DELETE FROM sku_promo_relations;
 vacuum full sku_promo_relations;
 select count(*) from sku_promo_relations;
 
+--PARA DEFINIR EL TAMAÑO DE MEMORIA QUE POSTGRESS PUEDE USAR DURANTE LA EJECUCIÓN DE VACCUM
+O DE COPY Y QUE SE HAGA MAS RÁPIDO
+SHOW maintenance_work_mem;
+SET maintenance_work_mem = '1GB';
+
 */
