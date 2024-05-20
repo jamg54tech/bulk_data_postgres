@@ -51,7 +51,6 @@ CREATE TABLE IF NOT EXISTS skus (
 ALTER TABLE skus ADD PRIMARY KEY (sku);
 
 
-
 CREATE TABLE IF NOT EXISTS sku_promo_relations (
     institutional_promo_id VARCHAR(100),
     sku_promotions VARCHAR(100),
