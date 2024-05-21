@@ -94,6 +94,111 @@ def main():
     cur = conn.cursor()
 
     try:
+
+        print("\n\n==============PROCESANDO ARCHIVO DE PROMOCIONES...");
+
+        print("BORRANDO DATOS DE TABLA promotions:")
+        query = sql.SQL("TRUNCATE TABLE promotions CASCADE;")
+        cur.execute(query)
+        conn.commit()
+
+
+        print("BORRANDO CONSTRAINT promotions_pkey")
+        query = sql.SQL("ALTER TABLE promotions DROP CONSTRAINT IF EXISTS promotions_pkey CASCADE;")
+        cur.execute(query)
+        conn.commit()
+
+
+        # Define the COPY command for promotions
+        print("INSERTANDO DATOS EN LA TABLA promotions");
+        promotions_file = "liverpool_sku_promotion.csv";
+        process_sku_promotion_file(conn,cur,base_path,promotions_file);
+
+        print("CREANDO CONSTRAINT promotions_pkey:")
+        query = sql.SQL("ALTER TABLE promotions ADD PRIMARY KEY (promo_id);")
+        cur.execute(query)
+        conn.commit()
+
+        print("\n\n==============PROCESANDO ARCHIVO DE SKUS...");
+
+        print("BORRANDO DATOS DE TABLA skus:")
+        query = sql.SQL("TRUNCATE TABLE skus CASCADE;")
+        cur.execute(query)
+        conn.commit()
+
+        print("BORRANDO CONSTRAINT skus_pkey")
+        query = sql.SQL("ALTER TABLE skus DROP CONSTRAINT IF EXISTS skus_pkey CASCADE;")
+        cur.execute(query)
+        conn.commit()
+
+        print("INSERTANDO DATOS EN LA TABLA skus")
+        lp_inst_sku_promotion_file = "lp_institutional_promotion.csv"
+        process_lp_institution_sku_promotion_file(conn,cur,base_path,lp_inst_sku_promotion_file)
+
+        print("CREANDO CONSTRAINT skus_pkey:")
+        query = sql.SQL("ALTER TABLE skus ADD PRIMARY KEY (sku);")
+        cur.execute(query)
+        conn.commit()
+
+        print("\n\n==============PROCESANDO ARCHIVO DE RELACIONES...");
+
+        print("BORRANDO CONSTRAINT inst_promo_id_foreign_key:")
+        query = sql.SQL("ALTER TABLE sku_promo_relations DROP CONSTRAINT IF EXISTS inst_promo_id_foreign_key;")
+        cur.execute(query)
+        conn.commit()
+
+        print("BORRANDO CONSTRAINT promo_id_foreign_key:")
+        query = sql.SQL("ALTER TABLE sku_promo_relations DROP CONSTRAINT IF EXISTS promo_id_foreign_key;")
+        cur.execute(query)
+        conn.commit()
+
+        print("BORRANDO DATOS DE TABLA lp_instnl_sku_promotion:")
+        query = sql.SQL("TRUNCATE TABLE sku_promo_relations;")
+        cur.execute(query)
+        conn.commit()
+
+        print("REGISTRANDO ROWS")
+        lp_relations_file = "lp_instnl_sku_promotion.csv"
+        process_relations_file(conn,cur,base_path,lp_relations_file);
+
+        print("CREANDO CONSTRAINT inst_promo_id_foreign_key:")
+        query = sql.SQL("ALTER TABLE sku_promo_relations ADD CONSTRAINT inst_promo_id_foreign_key FOREIGN KEY (institutional_promo_id) REFERENCES skus (sku) ON DELETE CASCADE ON UPDATE CASCADE;")
+        cur.execute(query)
+        conn.commit()
+
+        print("CREANDO CONSTRAINT promo_id_foreign_key:")
+        query = sql.SQL("ALTER TABLE sku_promo_relations ADD CONSTRAINT promo_id_foreign_key FOREIGN KEY (sku_promotions) REFERENCES promotions (promo_id) ON DELETE CASCADE ON UPDATE CASCADE;")
+        cur.execute(query)
+        conn.commit()
+
+
+        print("\n\n PROCESAMIENTO EXITOSO")
+
+    except Exception as e:
+        print("ERROR:",str(e));
+
+    # Close the cursor and connection
+    cur.close()
+    conn.close()
+
+    print("\n\n PROCESO FINALIZADO:",datetime.now());
+    print("INICIANDO PROCESO DE CARGA DE DATOS:",datetime.now());
+    print("\n CREANDO CONEXION...");
+
+    conn = psycopg2.connect(
+        dbname="promotions",
+        user = "postgres",
+        password = "n0m3l0",
+        host = "localhost",
+        port = "5432"
+    )
+
+    #Folder where promotions files will be stored
+    base_path="C:\\Users\\jamolinag\\Desktop\\liverpool\\liverpool_promoitons_files\\20MAYO2024\\";
+    # Create a cursor object using the connection
+    cur = conn.cursor()
+
+    try:
         
         print("\n\n==============PROCESANDO ARCHIVO DE PROMOCIONES...");
         # Define the COPY command for promotions

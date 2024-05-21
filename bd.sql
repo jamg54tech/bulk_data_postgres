@@ -67,11 +67,11 @@ REFERENCES promotions (promo_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER USER "postgres" WITH PASSWORD 'n0m3l0';
 
+/*
+
 SELECT usename, application_name, client_addr, client_port, backend_start, backend_type
 FROM pg_stat_activity
 WHERE state = 'active';
-
-/*
 
 DELETE FROM promotions;
 vacuum full promotions;
