@@ -13,7 +13,7 @@ CREATE DATABASE promotions
     CONNECTION LIMIT = -1
     IS_TEMPLATE = False;
 
-CREATE TABLE IF NOT EXISTS promotions (
+CREATE TABLE IF NOT EXISTS liverpool_sku_promotion (
     promo_id VARCHAR(100),
     promo_type VARCHAR(100),
     sort_score VARCHAR(100),
@@ -38,34 +38,34 @@ CREATE TABLE IF NOT EXISTS promotions (
     promo_price VARCHAR(100)
 );
 
-ALTER TABLE promotions ADD PRIMARY KEY (promo_id);
+ALTER TABLE liverpool_sku_promotion ADD PRIMARY KEY (promo_id);
 
-CREATE TABLE IF NOT EXISTS skus (
-    sku VARCHAR(100),
+CREATE TABLE IF NOT EXISTS lp_institutional_promotion (
+    institutional_promo_id VARCHAR(100),
     last_update_time TIMESTAMP,
     site_id VARCHAR(100),
     product_type VARCHAR(100),
     call_promo_service VARCHAR(100)
 );
 
-ALTER TABLE skus ADD PRIMARY KEY (sku);
+ALTER TABLE lp_institutional_promotion ADD PRIMARY KEY (institutional_promo_id);
 
 
-CREATE TABLE IF NOT EXISTS sku_promo_relations (
+CREATE TABLE IF NOT EXISTS lp_instnl_sku_promotion (
     institutional_promo_id VARCHAR(100),
     sku_promotions VARCHAR(100),
     sequence INTEGER
 );
 
-ALTER TABLE sku_promo_relations ADD CONSTRAINT inst_promo_id_foreign_key 
+ALTER TABLE lp_instnl_sku_promotion ADD CONSTRAINT inst_promo_id_foreign_key 
 FOREIGN KEY (institutional_promo_id) 
-REFERENCES skus (sku) ON DELETE CASCADE ON UPDATE CASCADE;
+REFERENCES lp_institutional_promotion (institutional_promo_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE sku_promo_relations ADD CONSTRAINT promo_id_foreign_key 
+ALTER TABLE lp_instnl_sku_promotion ADD CONSTRAINT promo_id_foreign_key 
 FOREIGN KEY (sku_promotions) 
-REFERENCES promotions (promo_id) ON DELETE CASCADE ON UPDATE CASCADE;
+REFERENCES liverpool_sku_promotion (promo_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER USER "postgres" WITH PASSWORD 'n0m3l0';
+ALTER USER "postgres" WITH PASSWORD 'admin123';
 
 /*
 
